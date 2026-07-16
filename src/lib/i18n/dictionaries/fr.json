@@ -1,0 +1,145 @@
+{
+  "meta": {
+    "site_name": "ConcoursMaroc",
+    "tagline": "Votre plateforme de préparation aux concours marocains"
+  },
+  "nav": {
+    "home": "Accueil",
+    "concours": "Concours",
+    "library": "Bibliothèque",
+    "exams": "Annales",
+    "blog": "Blog",
+    "categories": "Catégories",
+    "search": "Recherche"
+  },
+  "hero": {
+    "badge": "La plateforme N°1 au Maroc",
+    "title_1": "Préparez votre concours",
+    "title_2": "en toute simplicité",
+    "subtitle": "Des milliers de documents, annales de concours et articles éducatifs. Tout ce dont vous avez besoin pour réussir est à portée de main.",
+    "search_placeholder": "Rechercher un concours, une institution ou une matière...",
+    "cta": "Explorer les concours",
+    "cta_secondary": "Bibliothèque"
+  },
+  "home": {
+    "latest_concours": "Derniers concours",
+    "popular_concours": "Concours les plus consultés",
+    "latest_pdfs": "Derniers documents",
+    "view_all": "Voir tout",
+    "statistics": "Statistiques de la plateforme",
+    "total_concours": "concours",
+    "total_pdfs": "documents",
+    "total_institutions": "institutions",
+    "total_categories": "catégories"
+  },
+  "concours": {
+    "title": "Concours",
+    "deadline": "Date limite",
+    "concours_date": "Date du concours",
+    "institution": "Institution",
+    "city": "Ville",
+    "year": "Année",
+    "category": "Catégorie",
+    "postes": "Nombre de postes",
+    "eligibility": "Conditions d'éligibilité",
+    "diploma_required": "Diplôme requis",
+    "official_pdf": "Annonce officielle",
+    "download_official": "Télécharger l'annonce officielle",
+    "previous_exams": "Annales",
+    "related": "Concours similaires",
+    "share": "Partager",
+    "views": "vues",
+    "no_results": "Aucun concours trouvé",
+    "filters": "Filtres",
+    "all_categories": "Toutes les catégories",
+    "all_cities": "Toutes les villes",
+    "all_years": "Toutes les années"
+  },
+  "pdf": {
+    "title": "Bibliothèque",
+    "download": "Télécharger",
+    "preview": "Aperçu",
+    "file_type": "Type de fichier",
+    "file_size": "Taille du fichier",
+    "subject": "Matière",
+    "no_results": "Aucun document trouvé",
+    "downloads": "téléchargements"
+  },
+  "blog": {
+    "title": "Blog",
+    "read_more": "Lire la suite",
+    "author": "Auteur",
+    "published": "Date de publication",
+    "related": "Articles connexes",
+    "no_results": "Aucun article trouvé"
+  },
+  "annales": {
+    "title": "Annales",
+    "subject": "Matière",
+    "correction": "Correction",
+    "no_results": "Aucune annale trouvée"
+  },
+  "categories": {
+    "title": "Catégories",
+    "explore": "Explorer",
+    "competitions": "concours"
+  },
+  "search": {
+    "title": "Résultats de recherche",
+    "no_results": "Aucun résultat pour",
+    "try_again": "Essayez avec d'autres mots-clés",
+    "results_for": "Résultats pour"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "close": "Fermer",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "of": "sur",
+    "showing": "Affichage de",
+    "items": "éléments",
+    "newsletter": "Newsletter",
+    "newsletter_desc": "Inscrivez-vous pour recevoir les dernières actualités et concours",
+    "email_placeholder": "Votre adresse email",
+    "subscribe": "S'inscrire",
+    "subscribed": "Inscription réussie!",
+    "footer_desc": "Plateforme spécialisée dans les concours marocains. Tout ce dont vous avez besoin pour vous préparer, gratuitement.",
+    "all_rights": "Tous droits réservés",
+    "quick_links": "Liens rapides",
+    "contact": "Contact",
+    "follow_us": "Suivez-nous",
+    "help": "Aide",
+    "track_order": "Suivre la commande",
+    "language": "Langue",
+    "dark_mode": "Mode sombre",
+    "light_mode": "Mode clair"
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "q1": "Comment trouver un concours adapté ?",
+    "a1": "Utilisez la barre de recherche ou parcourez les catégories pour trouver le concours adapté à vos qualifications.",
+    "q2": "La plateforme est-elle gratuite ?",
+    "a2": "Oui, tous les services sont entièrement gratuits. Aucune inscription ni abonnement n'est nécessaire.",
+    "q3": "Comment télécharger les documents ?",
+    "a3": "Cliquez sur le bouton de téléchargement sur n'importe quel document. Pas besoin de vous connecter.",
+    "q4": "Comment me préparer pour un concours d'enseignement ?",
+    "a4": "Parcourez la section blog pour obtenir des conseils et des conseils de préparation.",
+    "q5": "Proposez-vous de nouveaux concours ?",
+    "a5": "Oui, nous mettons à jour les concours régulièrement. Suivez-nous pour les dernières actualités.",
+    "q6": "Comment puis-je vous contacter ?",
+    "a6": "Vous pouvez nous contacter par email ou via les réseaux sociaux.",
+    "q7": "Puis-je suggérer un concours ?",
+    "a7": "Oui, vous pouvez suggérer de nouveaux concours via la page de contact.",
+    "q8": "Comment obtenir les notifications des nouveaux concours ?",
+    "a8": "Inscrivez-vous à la newsletter pour recevoir les notifications des nouveaux concours."
+  },
+  "legal": {
+    "privacy_policy": "Politique de Confidentialité",
+    "terms_conditions": "Conditions Générales",
+    "about": "À Propos",
+    "contact": "Contact"
+  }
+}
