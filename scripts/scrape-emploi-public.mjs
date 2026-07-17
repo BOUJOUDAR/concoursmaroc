@@ -219,8 +219,21 @@ async function fetchDetailPage(url) {
     }
   });
 
-  const pdfLink = $("a[href*='/ar/تحميل/المباريات/arrete/']").attr("href");
-  if (pdfLink) detail.arreteUrl = `${BASE_URL}${pdfLink}`;
+  detail.pdfs = {};
+  const pdfTypes = {
+    "arrete": "قرار فتح المباراة",
+    "list_convoques": "لائحة المترشحين المدعوين لاجتياز المباراة",
+    "list_convoques_oral": "لائحة المدعوين لإجراء الاختبار الشفوي",
+    "list_resultats": "نتيجة المباراة",
+    "list_attente": "لائحة الانتظار",
+  };
+  for (const [type, label] of Object.entries(pdfTypes)) {
+    const href = $(`a[href*='/ar/تحميل/المباريات/${type}/']`).attr("href");
+    if (href) {
+      detail.pdfs[type] = { url: `${BASE_URL}${href}`, label };
+    }
+  }
+  if (detail.pdfs.arrete) detail.arreteUrl = detail.pdfs.arrete.url;
 
   const websiteLink = $(".details-contact .form-info a").attr("href");
   if (websiteLink) detail.officialWebsite = websiteLink;
@@ -298,7 +311,9 @@ function buildConcoursRecord(item, detail) {
     eligibility_fr: null,
     diploma_required_ar: detail?.grade || null,
     diploma_required_fr: null,
-    official_pdf_url: detail?.arreteUrl || null,
+    official_pdf_url: detail?.pdfs && Object.keys(detail.pdfs).length > 0
+      ? JSON.stringify(detail.pdfs)
+      : detail?.arreteUrl || null,
     source_url: item.source_url,
     postes_count: detail?.positions || item.positions || null,
     is_active: true,
@@ -356,7 +371,8 @@ async function main() {
 
     const detail = await fetchDetailPage(item.source_url);
     if (detail) {
-      console.log(`  Detail fetched: ${detail.positions || "?"} postes, deadline: ${detail.deadline || "?"}`);
+      const pdfCount = detail.pdfs ? Object.keys(detail.pdfs).length : 0;
+      console.log(`  Detail: ${detail.positions || "?"} postes, deadline: ${detail.deadline || "?"}, PDFs: ${pdfCount}`);
     }
 
     const record = buildConcoursRecord(item, detail);
