@@ -153,12 +153,17 @@ function ConcoursManager() {
 
   const handleSave = async () => {
     if (!editing) return;
-    const { id, ...rest } = editing;
+    const { id, ...rawRest } = editing;
+    const rest = Object.fromEntries(
+      Object.entries(rawRest).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+    );
     if (editing.id.startsWith("new-")) {
-      const { data } = await supabase.from("concours").insert(rest).select().single();
+      const { data, error } = await supabase.from("concours").insert(rest).select().single();
+      if (error) { alert("Error: " + error.message); return; }
       if (data) setItems((prev) => [data, ...prev.filter((i) => !i.id.startsWith("new-"))]);
     } else {
-      await supabase.from("concours").update(rest).eq("id", id);
+      const { error } = await supabase.from("concours").update(rest).eq("id", id);
+      if (error) { alert("Error: " + error.message); return; }
       setItems((prev) => prev.map((i) => (i.id === id ? editing : i)));
     }
     setEditing(null);
@@ -261,12 +266,17 @@ function DocumentsManager() {
 
   const handleSave = async () => {
     if (!editing) return;
-    const { id, ...rest } = editing;
+    const { id, ...rawRest } = editing;
+    const rest = Object.fromEntries(
+      Object.entries(rawRest).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+    );
     if (editing.id.startsWith("new-")) {
-      const { data } = await supabase.from("documents").insert(rest).select().single();
+      const { data, error } = await supabase.from("documents").insert(rest).select().single();
+      if (error) { alert("Error: " + error.message); return; }
       if (data) setItems((prev) => [data, ...prev.filter((i) => !i.id.startsWith("new-"))]);
     } else {
-      await supabase.from("documents").update(rest).eq("id", id);
+      const { error } = await supabase.from("documents").update(rest).eq("id", id);
+      if (error) { alert("Error: " + error.message); return; }
       setItems((prev) => prev.map((i) => (i.id === id ? editing : i)));
     }
     setEditing(null);
@@ -335,12 +345,17 @@ function ArticlesManager() {
 
   const handleSave = async () => {
     if (!editing) return;
-    const { id, ...rest } = editing;
+    const { id, ...rawRest } = editing;
+    const rest = Object.fromEntries(
+      Object.entries(rawRest).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+    );
     if (editing.id.startsWith("new-")) {
-      const { data } = await supabase.from("articles").insert(rest).select().single();
+      const { data, error } = await supabase.from("articles").insert(rest).select().single();
+      if (error) { alert("Error: " + error.message); return; }
       if (data) setItems((prev) => [data, ...prev.filter((i) => !i.id.startsWith("new-"))]);
     } else {
-      await supabase.from("articles").update(rest).eq("id", id);
+      const { error } = await supabase.from("articles").update(rest).eq("id", id);
+      if (error) { alert("Error: " + error.message); return; }
       setItems((prev) => prev.map((i) => (i.id === id ? editing : i)));
     }
     setEditing(null);
