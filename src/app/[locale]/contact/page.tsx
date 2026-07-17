@@ -49,10 +49,10 @@ export default async function ContactPage({ params }: Props) {
               {isAr ? "أرسل لنا رسالة بريد إلكتروني" : "Envoyez-nous un email"}
             </p>
             <a
-              href="mailto:contact@concoursmaroc.ma"
+              href="mailto:stagegep@gmail.com"
               className="text-brand-600 hover:underline text-sm font-medium"
             >
-              contact@concoursmaroc.ma
+              stagegep@gmail.com
             </a>
           </div>
 

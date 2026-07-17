@@ -92,7 +92,7 @@ export function Footer({ dict, locale }: FooterProps) {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <span className="text-brand-600">✉</span>
-                <span>contact@concoursmaroc.ma</span>
+                <span>stagegep@gmail.com</span>
               </li>
             </ul>
           </div>
