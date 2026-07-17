@@ -53,7 +53,11 @@
     "filters": "Filtres",
     "all_categories": "Toutes les catégories",
     "all_cities": "Toutes les villes",
-    "all_years": "Toutes les années"
+    "all_years": "Toutes les années",
+    "status_all": "Tous",
+    "status_open": "Ouverts",
+    "status_closing_soon": "Se termine bientôt",
+    "status_closed": "Fermés"
   },
   "pdf": {
     "title": "Bibliothèque",

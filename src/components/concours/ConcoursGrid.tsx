@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { type Locale } from "@/lib/i18n/config";
 import { type Dictionary } from "@/lib/i18n/get-dictionary";
 import { type ConcoursListItem } from "@/types/concours";
+import { getConcoursStatus, type ConcoursStatus } from "@/lib/utils/concours-status";
 import { ConcoursCard } from "./ConcoursCard";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -21,6 +22,13 @@ interface ConcoursGridProps {
   years: number[];
 }
 
+const STATUS_FILTERS: { key: ConcoursStatus | "all"; dot: string }[] = [
+  { key: "all", dot: "" },
+  { key: "open", dot: "bg-green-500" },
+  { key: "closing_soon", dot: "bg-yellow-500" },
+  { key: "closed", dot: "bg-red-500" },
+];
+
 export function ConcoursGrid({
   concours,
   dict,
@@ -33,6 +41,21 @@ export function ConcoursGrid({
 }: ConcoursGridProps) {
   const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<ConcoursStatus | "all">("all");
+
+  const filteredConcours = statusFilter === "all"
+    ? concours
+    : concours.filter((c) => getConcoursStatus(c.deadline) === statusFilter);
+
+  const statusLabel = (key: ConcoursStatus | "all"): string => {
+    const map: Record<string, string> = {
+      all: dict.concours.status_all,
+      open: dict.concours.status_open,
+      closing_soon: dict.concours.status_closing_soon,
+      closed: dict.concours.status_closed,
+    };
+    return map[key];
+  };
 
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams();
@@ -54,6 +77,29 @@ export function ConcoursGrid({
 
   return (
     <div>
+      {/* Status Filter Buttons */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {STATUS_FILTERS.map(({ key, dot }) => {
+          const active = statusFilter === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setStatusFilter(key)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                active
+                  ? "bg-brand text-brand-foreground"
+                  : "bg-card border border-border text-muted hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              {dot && (
+                <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${active ? "bg-brand-foreground" : dot}`} />
+              )}
+              {statusLabel(key)}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Filter Bar */}
       <div className="mb-6">
         <button
@@ -126,20 +172,20 @@ export function ConcoursGrid({
       )}
 
       {/* Grid */}
-      {concours.length === 0 ? (
+      {filteredConcours.length === 0 ? (
         <EmptyState title={dict.concours.no_results} />
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {concours.slice(0, 3).map((item) => (
+            {filteredConcours.slice(0, 3).map((item) => (
               <ConcoursCard key={item.id} concours={item} dict={dict} locale={locale} />
             ))}
-            {concours.length > 3 && (
+            {filteredConcours.length > 3 && (
               <div className="col-span-full">
                 <AdSlot placement="between-cards" className="max-w-lg mx-auto" />
               </div>
             )}
-            {concours.slice(3).map((item) => (
+            {filteredConcours.slice(3).map((item) => (
               <ConcoursCard key={item.id} concours={item} dict={dict} locale={locale} />
             ))}
           </div>

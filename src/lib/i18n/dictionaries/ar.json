@@ -53,7 +53,11 @@
     "filters": "التصفية",
     "all_categories": "جميع الفئات",
     "all_cities": "جميع المدن",
-    "all_years": "جميع السنوات"
+    "all_years": "جميع السنوات",
+    "status_all": "الكل",
+    "status_open": "مفتوح",
+    "status_closing_soon": "ينتهي قريباً",
+    "status_closed": "مغلق"
   },
   "pdf": {
     "title": "المكتبة",
