@@ -141,5 +141,10 @@
     "terms_conditions": "Conditions Générales",
     "about": "À Propos",
     "contact": "Contact"
+  },
+  "concours_status": {
+    "closing_soon": "Se termine bientôt",
+    "open": "Ouvert",
+    "closed": "Terminé"
   }
 }

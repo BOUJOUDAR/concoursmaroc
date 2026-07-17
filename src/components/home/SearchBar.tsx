@@ -26,19 +26,19 @@ export function SearchBar({ dict, locale, size = "lg" }: SearchBarProps) {
   return (
     <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto">
       <div className="relative flex items-center">
-        <Search className="absolute left-4 h-5 w-5 text-muted" />
+        <Search className="absolute start-4 h-5 w-5 text-muted" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={dict.hero.search_placeholder}
-          className={`w-full rounded-xl border border-border bg-background pl-12 pr-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-shadow ${
+          className={`w-full rounded-xl border border-border bg-background ps-12 pe-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-shadow ${
             size === "lg" ? "py-4 text-base" : "py-3 text-sm"
           }`}
         />
         <button
           type="submit"
-          className={`absolute right-2 rounded-lg bg-brand-600 text-white font-medium hover:bg-brand-700 transition-colors ${
+          className={`absolute end-2 rounded-lg bg-brand-600 text-white font-medium hover:bg-brand-700 transition-colors ${
             size === "lg" ? "px-6 py-2.5" : "px-4 py-2 text-sm"
           }`}
         >

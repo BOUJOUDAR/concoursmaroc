@@ -3,7 +3,7 @@ import { type Locale } from "@/lib/i18n/config";
 import { type Dictionary } from "@/lib/i18n/get-dictionary";
 import { type ConcoursListItem } from "@/types/concours";
 import { formatDate, formatNumber } from "@/lib/utils/format-date";
-import { Calendar, MapPin, Building2, Users, Eye } from "lucide-react";
+import { Calendar, MapPin, Building2, Users, Eye, Clock } from "lucide-react";
 
 interface ConcoursCardProps {
   concours: ConcoursListItem;
@@ -11,9 +11,24 @@ interface ConcoursCardProps {
   locale: Locale;
 }
 
+function getConcoursStatus(deadline: string | null): { label: { ar: string; fr: string }; color: string } | null {
+  if (!deadline) return null;
+  const now = new Date();
+  const dl = new Date(deadline);
+  const diffMs = dl.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return null;
+  if (diffDays <= 3) return { label: { ar: "ينتهي قريباً", fr: "Se termine bientôt" }, color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" };
+  if (diffDays <= 14) return { label: { ar: "مفتوح", fr: "Ouvert" }, color: "bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-300" };
+  return { label: { ar: "مغلق", fr: "Ouvert" }, color: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" };
+}
+
 export function ConcoursCard({ concours, dict, locale }: ConcoursCardProps) {
   const title = locale === "ar" ? concours.title_ar : concours.title_fr;
   const hasDeadline = concours.deadline && new Date(concours.deadline) > new Date();
+  const status = getConcoursStatus(concours.deadline);
+  const isAr = locale === "ar";
 
   return (
     <Link
@@ -26,9 +41,17 @@ export function ConcoursCard({ concours, dict, locale }: ConcoursCardProps) {
           <span className="inline-flex items-center rounded-full bg-brand-100 dark:bg-brand-900 px-2.5 py-0.5 text-xs font-medium text-brand-700 dark:text-brand-300">
             {concours.category.toUpperCase()}
           </span>
-          <div className="flex items-center gap-1 text-xs text-muted">
-            <Eye className="h-3 w-3" />
-            {formatNumber(concours.view_count)}
+          <div className="flex items-center gap-2">
+            {status && (
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
+                <Clock className="h-3 w-3" />
+                {status.label[locale as "ar" | "fr"]}
+              </span>
+            )}
+            <div className="flex items-center gap-1 text-xs text-muted">
+              <Eye className="h-3 w-3" />
+              {formatNumber(concours.view_count)}
+            </div>
           </div>
         </div>
 
@@ -69,7 +92,7 @@ export function ConcoursCard({ concours, dict, locale }: ConcoursCardProps) {
           </div>
         )}
         <span className="text-xs text-brand-600 font-medium group-hover:underline">
-          {locale === "ar" ? "عرض التفاصيل" : "Voir les détails"} →
+          {isAr ? "عرض التفاصيل" : "Voir les détails"} →
         </span>
       </div>
     </Link>

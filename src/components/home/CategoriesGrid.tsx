@@ -53,7 +53,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export function CategoriesGrid({ categories, dict, locale }: CategoriesGridProps) {
   return (
-    <section className="py-16">
+    <section className="py-16 bg-muted/30">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl font-bold text-center mb-10">
           {dict.categories.title}
@@ -73,9 +73,9 @@ export function CategoriesGrid({ categories, dict, locale }: CategoriesGridProps
               >
                 <Link
                   href={`/${locale}/categories/${cat.slug}`}
-                  className="flex flex-col items-center gap-3 p-5 rounded-xl border border-border bg-card hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-800 hover:-translate-y-1 transition-all duration-300"
+                  className="group flex flex-col items-center gap-3 p-6 rounded-2xl border border-border bg-card hover:shadow-lg hover:border-brand-300 dark:hover:border-brand-700 hover:-translate-y-1 transition-all duration-300"
                 >
-                  <div className="rounded-full bg-brand-100 dark:bg-brand-900 p-3">
+                  <div className="rounded-xl bg-brand-50 dark:bg-brand-950 p-3.5 group-hover:bg-brand-100 dark:group-hover:bg-brand-900 transition-colors">
                     <Icon className="h-6 w-6 text-brand-600" />
                   </div>
                   <span className="text-sm font-medium text-center line-clamp-2">

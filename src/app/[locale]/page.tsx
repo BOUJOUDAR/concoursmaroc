@@ -57,17 +57,17 @@ export default async function HomePage({ params }: Props) {
         dict={dict}
         locale={locale}
       />
-      <LatestPDFs
-        documents={latestPDFs.data || []}
-        dict={dict}
-        locale={locale}
-      />
       <CategoriesGrid
         categories={categories.data || []}
         dict={dict}
         locale={locale}
       />
       <Stats dict={dict} />
+      <LatestPDFs
+        documents={latestPDFs.data || []}
+        dict={dict}
+        locale={locale}
+      />
       <FAQ dict={dict} />
     </>
   );

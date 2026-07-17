@@ -1,8 +1,8 @@
 # PROJECT_MAP.md — ConcoursMaroc Platform
 
-> **Date:** 2026-07-15
+> **Date:** 2026-07-17
 > **Role:** Staff Software Engineer / Tech Lead
-> **Status:** Architecture Planning (Pre-Implementation)
+> **Status:** Deployed & Live (Production Bug-Fix Pass)
 
 ---
 
@@ -754,20 +754,20 @@ logger.warn("High download count", { documentId, count });
 ## 15. Environment Variables
 
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
-SUPABASE_SERVICE_ROLE_KEY=eyJxxx...
+# Supabase (Vercel env vars)
+NEXT_PUBLIC_SUPABASE_URL=https://fbhqiuziycnoznpngjht.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJxxx...  # anon key (public)
+SUPABASE_SECRET_KEY=eyJxxx...                   # service role (server only)
 
 # Admin
-ADMIN_SECRET=your-secret-here
+NEXT_PUBLIC_ADMIN_SECRET=your-secret-here       # URL-based access: /ar/admin?secret=...
+NEXT_PUBLIC_APP_URL=https://concoursmaroc-nu.vercel.app
 
 # Analytics
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 
-# App
-NEXT_PUBLIC_APP_URL=https://concoursmaroc.ma
-NEXT_PUBLIC_APP_NAME=ConcoursMaroc
+# Deployed at
+# https://concoursmaroc-nu.vercel.app
 ```
 
 ---
@@ -776,30 +776,40 @@ NEXT_PUBLIC_APP_NAME=ConcoursMaroc
 
 ### All Implementation Complete ✅
 
-All 35 files from the File Creation Order have been created.
+All 35+ files from the File Creation Order have been created.
 All 5 phases are marked complete.
+**Deployed to Vercel:** https://concoursmaroc-nu.vercel.app
+**GitHub repo:** https://github.com/BOUJOUDAR/concoursmaroc
+
+### Completed Post-Deploy Fixes (2026-07-17)
+- [x] Fixed TypeScript errors (params casts, ShareButtons, admin localStorage, error.tsx)
+- [x] Fixed `revalidate` exports (literal numbers instead of constants)
+- [x] Created legal pages (Privacy, Terms, About, Contact) — bilingual
+- [x] Added robots.ts, sitemap.ts, ads.txt, footer legal links
+- [x] Admin panel CRUD with error handling + empty field filtering
+- [x] Supabase schema: created 6 tables, seeded 21 categories, 16 concours, 8 docs, 8 annales, 4 articles
+- [x] Uploaded all PDFs to Supabase Storage
+- [x] Fixed ar.json translation corruptions (hero subtitle, FAQ q4, FAQ q8)
+- [x] Fixed canonical URL (was using localhost in production)
+- [x] FAQ: switched to `<details>/<summary>` for SSR-compatible accordion
+- [x] Hero: improved CTA design (larger buttons, shadow, active scale, decorative pattern)
+- [x] ConcoursCard: added status badges (closing soon / open / closed)
+- [x] Stats: improved icons with colored backgrounds, rounded-2xl cards
+- [x] CategoriesGrid: improved chip styling (rounded-2xl, group hover, bg-muted/30 section)
+- [x] RTL: fixed SearchBar (use logical properties start/end/ps/pe), fixed arrow direction in all sections
+- [x] Visual hierarchy: reordered homepage sections, alternating bg-muted/30
+- [x] Updated PROJECT_MAP.md
 
 ### Remaining External Tasks (Not Code — Require Human Action)
-- [ ] Create Supabase project and run `supabase/schema.sql`
-- [ ] Set environment variables in `.env.local`
-- [ ] Deploy to Vercel (`vercel deploy`)
-- [ ] Configure custom domain
-- [ ] Set up Google Analytics 4 (get `G-XXXXXXXXXX`)
-- [ ] Submit sitemap to Google Search Console
-- [ ] Set up Google AdSense account
-- [ ] Create OG images (1200x630) for each page type
-- [ ] Add real concours data via admin panel or SQL inserts
-- [ ] Upload PDF documents to Supabase Storage
-- [ ] Write initial blog articles for SEO
-- [ ] Test RTL/LTR on mobile devices
-- [ ] Run Lighthouse audit and fix any issues
-- [ ] Set up Vercel Analytics (optional)
-
-### Technical Notes
-- `next-sitemap` v4.2.3 last updated Sep 2023 — stable, no issues with Next.js 15
-- Tailwind v4 uses CSS-first config (`@theme` in `globals.css`), no `tailwind.config.ts`
-- TypeScript 7.0 may have editor compatibility — fallback to 5.x if needed
-- shadcn/ui components NOT installed via CLI (add as needed: `npx shadcn@latest add button card dialog`)
+- [ ] **DB:** Run `ALTER TABLE concours ADD COLUMN IF NOT EXISTS annonce_officielle TEXT;` in Supabase SQL editor
+- [ ] **DB:** Clean placeholder test concours data (`AAAAAAAAAAAAmaroc`, `ensaaa` — entries with no meaningful content)
+- [ ] **ads.txt:** Replace `pub-XXXXXXXXXXXXXXXX` with real AdSense publisher ID
+- [ ] **Domain:** Configure custom domain on Vercel (concoursmaroc.ma)
+- [ ] **Analytics:** Set up Google Analytics 4 (get `G-XXXXXXXXXX`)
+- [ ] **Search Console:** Submit sitemap to Google Search Console
+- [ ] **OG Images:** Create OG images (1200x630) for each page type
+- [ ] **Testing:** Test RTL/LTR on mobile devices
+- [ ] **Audit:** Run Lighthouse audit and fix any issues
 
 ---
 

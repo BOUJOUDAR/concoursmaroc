@@ -7,7 +7,7 @@ export const SITE_CONFIG = {
     ar: "منصة مجانية للتحضير للمسابقات المغربية. آلاف الوثائق والامتحانات السابقة والمقالات التعليمية.",
     fr: "Plateforme gratuite de préparation aux concours marocains. Des milliers de documents, annales et articles éducatifs.",
   },
-  url: process.env.NEXT_PUBLIC_APP_URL || "https://concoursmaroc.ma",
+  url: process.env.NEXT_PUBLIC_APP_URL || "https://concoursmaroc-nu.vercel.app",
   ogImage: "/og-default.png",
   keywords: {
     ar: [
