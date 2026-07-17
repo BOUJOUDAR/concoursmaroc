@@ -9,7 +9,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 type Props = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ category?: string; city?: string; year?: string; page?: string }>;
+  searchParams: Promise<{ category?: string; city?: string; year?: string; status?: string; page?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ConcoursPage({ params, searchParams }: Props) {
   const { locale: rawLocale } = await params; const locale = rawLocale as Locale;
-  const { category, city, year, page } = await searchParams;
+  const { category, city, year, status, page } = await searchParams;
   const dict = await getDictionary(locale);
   const supabase = await createClient();
 
@@ -41,13 +41,26 @@ export default async function ConcoursPage({ params, searchParams }: Props) {
   if (city) query = query.eq("city", city);
   if (year) query = query.eq("year", parseInt(year, 10));
 
+  if (status === "open") {
+    const threeDaysFromNow = new Date();
+    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+    query = query.gt("deadline", threeDaysFromNow.toISOString().split("T")[0]);
+  } else if (status === "closing_soon") {
+    const today = new Date().toISOString().split("T")[0];
+    const threeDaysFromNow = new Date();
+    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+    query = query.gte("deadline", today).lte("deadline", threeDaysFromNow.toISOString().split("T")[0]);
+  } else if (status === "closed") {
+    const today = new Date().toISOString().split("T")[0];
+    query = query.lt("deadline", today);
+  }
+
   const { data, count } = await query
     .order("created_at", { ascending: false })
     .range(offset, offset + ITEMS_PER_PAGE - 1);
 
   const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 0;
 
-  // Get unique cities for filters
   const { data: citiesData } = await supabase
     .from("concours")
     .select("city")
@@ -56,7 +69,6 @@ export default async function ConcoursPage({ params, searchParams }: Props) {
 
   const cities = [...new Set((citiesData || []).map((c) => c.city).filter(Boolean))] as string[];
 
-  // Get unique years
   const { data: yearsData } = await supabase
     .from("concours")
     .select("year")
@@ -77,7 +89,7 @@ export default async function ConcoursPage({ params, searchParams }: Props) {
         locale={locale}
         currentPage={currentPage}
         totalPages={totalPages}
-        filters={{ category, city, year }}
+        filters={{ category, city, year, status }}
         cities={cities}
         years={years}
       />
