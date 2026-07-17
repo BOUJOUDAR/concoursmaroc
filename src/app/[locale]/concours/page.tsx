@@ -85,4 +85,4 @@ export default async function ConcoursPage({ params, searchParams }: Props) {
   );
 }
 
-export const revalidate = REVALIDATION_TIMES.concoursList;
+export const revalidate = 1800;

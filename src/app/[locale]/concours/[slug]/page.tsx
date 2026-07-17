@@ -296,4 +296,4 @@ export default async function ConcoursDetailPage({ params }: Props) {
   );
 }
 
-export const revalidate = REVALIDATION_TIMES.concoursDetail;
+export const revalidate = 3600;

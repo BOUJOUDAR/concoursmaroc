@@ -73,4 +73,4 @@ export default async function HomePage({ params }: Props) {
   );
 }
 
-export const revalidate = REVALIDATION_TIMES.homepage;
+export const revalidate = 3600;

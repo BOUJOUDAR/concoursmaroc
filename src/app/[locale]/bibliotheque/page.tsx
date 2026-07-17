@@ -97,4 +97,4 @@ export default async function BibliothquePage({ params, searchParams }: Props) {
   );
 }
 
-export const revalidate = REVALIDATION_TIMES.pdfLibrary;
+export const revalidate = 1800;

@@ -93,4 +93,4 @@ export default async function BlogPage({ params, searchParams }: Props) {
   );
 }
 
-export const revalidate = REVALIDATION_TIMES.blogArticle;
+export const revalidate = 86400;
