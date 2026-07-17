@@ -7,6 +7,7 @@ import { REVALIDATION_TIMES, SITE_CONFIG } from "@/lib/utils/constants";
 import { generateSEOMetadata } from "@/lib/seo/generate-metadata";
 import { generateBreadcrumbSchema } from "@/lib/seo/json-ld";
 import { formatDate, formatNumber } from "@/lib/utils/format-date";
+import { getConcoursStatus, STATUS_CONFIG } from "@/lib/utils/concours-status";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ShareButtons } from "@/components/concours/ShareButtons";
 import { ConcoursCard } from "@/components/concours/ConcoursCard";
@@ -19,6 +20,7 @@ import {
   FileText,
   ExternalLink,
   Eye,
+  Clock,
 } from "lucide-react";
 
 type Props = {
@@ -130,6 +132,17 @@ export default async function ConcoursDetailPage({ params }: Props) {
                 <span className="inline-flex items-center rounded-full bg-brand-100 dark:bg-brand-900 px-3 py-1 text-xs font-medium text-brand-700 dark:text-brand-300">
                   {concours.category.toUpperCase()}
                 </span>
+                {(() => {
+                  const status = getConcoursStatus(concours.deadline);
+                  if (!status) return null;
+                  const cfg = STATUS_CONFIG[status];
+                  return (
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${cfg.color}`}>
+                      <Clock className="h-3 w-3" />
+                      {locale === "ar" ? cfg.labelAr : cfg.labelFr}
+                    </span>
+                  );
+                })()}
                 <span className="text-sm text-muted flex items-center gap-1">
                   <Eye className="h-3 w-3" />
                   {formatNumber(concours.view_count)} {dict.concours.views}

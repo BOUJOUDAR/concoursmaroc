@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { Plus, Trash2, Save, Pencil } from "lucide-react";
+import { Plus, Trash2, Save, Pencil, Clock } from "lucide-react";
+import { getConcoursStatus, STATUS_CONFIG, type ConcoursStatus } from "@/lib/utils/concours-status";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,6 +11,13 @@ const supabase = createClient(
 );
 
 type Tab = "concours" | "documents" | "articles";
+
+interface CategoryRow {
+  id: string;
+  slug: string;
+  name_ar: string;
+  name_fr: string;
+}
 
 interface ConcoursRow {
   id: string;
@@ -142,17 +150,41 @@ export default function AdminPage() {
   );
 }
 
+function StatusBadge({ deadline }: { deadline: string | null }) {
+  const status = getConcoursStatus(deadline);
+  if (!status) return null;
+  const cfg = STATUS_CONFIG[status];
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${cfg.color}`}>
+      <Clock className="h-3 w-3" />
+      {cfg.labelAr}
+    </span>
+  );
+}
+
 function ConcoursManager() {
   const [items, setItems] = useState<ConcoursRow[]>([]);
   const [editing, setEditing] = useState<ConcoursRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<CategoryRow[]>([]);
 
   useEffect(() => {
-    supabase.from("concours").select("*").order("created_at", { ascending: false }).then(({ data }) => { setItems(data || []); setLoading(false); });
+    Promise.all([
+      supabase.from("concours").select("*").order("created_at", { ascending: false }),
+      supabase.from("categories").select("id, slug, name_ar, name_fr").order("sort_order", { ascending: true }),
+    ]).then(([concoursRes, catRes]) => {
+      setItems(concoursRes.data || []);
+      setCategories(catRes.data || []);
+      setLoading(false);
+    });
   }, []);
 
   const handleSave = async () => {
     if (!editing) return;
+    if (!editing.category) {
+      alert("الرجاء اختيار فئة");
+      return;
+    }
     const { id, ...rawRest } = editing;
     const rest = Object.fromEntries(
       Object.entries(rawRest).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
@@ -186,7 +218,16 @@ function ConcoursManager() {
         </button>
       </div>
 
-      {editing && <ConcoursForm item={editing} onChange={setEditing} onSave={handleSave} onCancel={() => setEditing(null)} />}
+      {editing && (
+        <ConcoursForm
+          item={editing}
+          onChange={setEditing}
+          onSave={handleSave}
+          onCancel={() => setEditing(null)}
+          categories={categories}
+          setCategories={setCategories}
+        />
+      )}
 
       <div className="space-y-2">
         {items.map((item) => (
@@ -195,6 +236,7 @@ function ConcoursManager() {
               <p className="font-medium truncate">{item.title_fr}</p>
               <p className="text-xs text-muted">{item.institution} • {item.category} • {item.city} • {item.year}</p>
             </div>
+            <StatusBadge deadline={item.deadline} />
             <span className={`text-xs px-2 py-0.5 rounded-full ${item.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
               {item.is_active ? "Active" : "Inactive"}
             </span>
@@ -207,8 +249,55 @@ function ConcoursManager() {
   );
 }
 
-function ConcoursForm({ item, onChange, onSave, onCancel }: { item: ConcoursRow; onChange: (i: ConcoursRow) => void; onSave: () => void; onCancel: () => void }) {
+function ConcoursForm({
+  item,
+  onChange,
+  onSave,
+  onCancel,
+  categories,
+  setCategories,
+}: {
+  item: ConcoursRow;
+  onChange: (i: ConcoursRow) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  categories: CategoryRow[];
+  setCategories: React.Dispatch<React.SetStateAction<CategoryRow[]>>;
+}) {
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCatNameAr, setNewCatNameAr] = useState("");
+  const [newCatNameFr, setNewCatNameFr] = useState("");
+  const [newCatSlug, setNewCatSlug] = useState("");
+  const [addingCat, setAddingCat] = useState(false);
+
   const set = (k: keyof ConcoursRow, v: string | number | boolean) => onChange({ ...item, [k]: v });
+
+  const handleAddCategory = async () => {
+    if (!newCatSlug.trim() || !newCatNameAr.trim() || !newCatNameFr.trim()) {
+      alert("الرجاء ملء جميع الحقول");
+      return;
+    }
+    setAddingCat(true);
+    const slug = newCatSlug.trim().toLowerCase().replace(/\s+/g, "-");
+    const { data, error } = await supabase
+      .from("categories")
+      .insert({ slug, name_ar: newCatNameAr.trim(), name_fr: newCatNameFr.trim(), sort_order: categories.length + 1 })
+      .select("id, slug, name_ar, name_fr")
+      .single();
+    setAddingCat(false);
+    if (error) { alert("Error: " + error.message); return; }
+    if (data) {
+      setCategories((prev) => [...prev, data]);
+      set("category", slug);
+      setNewCatNameAr("");
+      setNewCatNameFr("");
+      setNewCatSlug("");
+      setShowNewCategory(false);
+    }
+  };
+
+  const selectedCategory = categories.find((c) => c.slug === item.category);
+
   return (
     <div className="mb-4 p-4 rounded-lg border border-brand-200 bg-brand-50/50 space-y-3">
       <div className="grid grid-cols-2 gap-3">
@@ -216,19 +305,92 @@ function ConcoursForm({ item, onChange, onSave, onCancel }: { item: ConcoursRow;
         <input placeholder="Institution" value={item.institution} onChange={(e) => set("institution", e.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm" />
         <input placeholder="Title FR" value={item.title_fr} onChange={(e) => set("title_fr", e.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm" />
         <input placeholder="Title AR" value={item.title_ar} onChange={(e) => set("title_ar", e.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm" />
-        <input placeholder="Category" value={item.category} onChange={(e) => set("category", e.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm" />
+
+        {/* Category dropdown */}
+        <div className="space-y-1">
+          <select
+            value={item.category}
+            onChange={(e) => set("category", e.target.value)}
+            className="w-full rounded-lg border border-border px-3 py-2 text-sm bg-background"
+          >
+            <option value="">-- اختر فئة --</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.slug}>
+                {cat.name_ar} ({cat.name_fr})
+              </option>
+            ))}
+          </select>
+          {!item.category && (
+            <p className="text-xs text-red-500">الرجاء اختيار فئة</p>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowNewCategory(!showNewCategory)}
+            className="text-xs text-brand-600 hover:text-brand-700 font-medium"
+          >
+            + إضافة فئة جديدة
+          </button>
+        </div>
+
         <input placeholder="City" value={item.city} onChange={(e) => set("city", e.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm" />
         <input type="number" placeholder="Year" value={item.year} onChange={(e) => set("year", parseInt(e.target.value) || 2026)} className="rounded-lg border border-border px-3 py-2 text-sm" />
         <input type="number" placeholder="Postes" value={item.postes_count} onChange={(e) => set("postes_count", parseInt(e.target.value) || 0)} className="rounded-lg border border-border px-3 py-2 text-sm" />
         <div>
           <label className="block text-xs font-medium mb-1">Date Limite (Deadline)</label>
           <input type="date" value={item.deadline} onChange={(e) => set("deadline", e.target.value)} className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
+          {item.deadline && (
+            <StatusBadge deadline={item.deadline} />
+          )}
         </div>
         <div>
           <label className="block text-xs font-medium mb-1">Date du Concours</label>
           <input type="date" value={item.concours_date} onChange={(e) => set("concours_date", e.target.value)} className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
         </div>
       </div>
+
+      {/* Inline new category form */}
+      {showNewCategory && (
+        <div className="p-3 rounded-lg border border-dashed border-brand-300 bg-brand-50/30 space-y-2">
+          <p className="text-xs font-medium text-brand-700">إضافة فئة جديدة</p>
+          <div className="grid grid-cols-3 gap-2">
+            <input
+              placeholder="Slug (e.g. ensa)"
+              value={newCatSlug}
+              onChange={(e) => setNewCatSlug(e.target.value)}
+              className="rounded-lg border border-border px-3 py-2 text-sm"
+            />
+            <input
+              placeholder="الاسم بالعربية"
+              value={newCatNameAr}
+              onChange={(e) => setNewCatNameAr(e.target.value)}
+              className="rounded-lg border border-border px-3 py-2 text-sm"
+            />
+            <input
+              placeholder="Nom en français"
+              value={newCatNameFr}
+              onChange={(e) => setNewCatNameFr(e.target.value)}
+              className="rounded-lg border border-border px-3 py-2 text-sm"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleAddCategory}
+              disabled={addingCat}
+              className="inline-flex items-center gap-1 rounded-lg bg-brand-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-brand-700 disabled:opacity-50"
+            >
+              <Plus className="h-3 w-3" />
+              {addingCat ? "جاري الإضافة..." : "إضافة"}
+            </button>
+            <button
+              onClick={() => { setShowNewCategory(false); setNewCatSlug(""); setNewCatNameAr(""); setNewCatNameFr(""); }}
+              className="px-3 py-1.5 rounded-lg border border-border text-xs hover:bg-muted"
+            >
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
+
       <div>
         <label className="block text-xs font-medium mb-1">Annonce Officielle (URL)</label>
         <input type="url" placeholder="https://..." value={item.annonce_officielle} onChange={(e) => set("annonce_officielle", e.target.value)} className="w-full rounded-lg border border-border px-3 py-2 text-sm" />

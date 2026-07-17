@@ -3,25 +3,13 @@ import { type Locale } from "@/lib/i18n/config";
 import { type Dictionary } from "@/lib/i18n/get-dictionary";
 import { type ConcoursListItem } from "@/types/concours";
 import { formatDate, formatNumber } from "@/lib/utils/format-date";
+import { getConcoursStatus, STATUS_CONFIG } from "@/lib/utils/concours-status";
 import { Calendar, MapPin, Building2, Users, Eye, Clock } from "lucide-react";
 
 interface ConcoursCardProps {
   concours: ConcoursListItem;
   dict: Dictionary;
   locale: Locale;
-}
-
-function getConcoursStatus(deadline: string | null): { label: { ar: string; fr: string }; color: string } | null {
-  if (!deadline) return null;
-  const now = new Date();
-  const dl = new Date(deadline);
-  const diffMs = dl.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) return null;
-  if (diffDays <= 3) return { label: { ar: "ينتهي قريباً", fr: "Se termine bientôt" }, color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" };
-  if (diffDays <= 14) return { label: { ar: "مفتوح", fr: "Ouvert" }, color: "bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-300" };
-  return { label: { ar: "مغلق", fr: "Ouvert" }, color: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" };
 }
 
 export function ConcoursCard({ concours, dict, locale }: ConcoursCardProps) {
@@ -43,9 +31,9 @@ export function ConcoursCard({ concours, dict, locale }: ConcoursCardProps) {
           </span>
           <div className="flex items-center gap-2">
             {status && (
-              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_CONFIG[status].color}`}>
                 <Clock className="h-3 w-3" />
-                {status.label[locale as "ar" | "fr"]}
+                {isAr ? STATUS_CONFIG[status].labelAr : STATUS_CONFIG[status].labelFr}
               </span>
             )}
             <div className="flex items-center gap-1 text-xs text-muted">
