@@ -6,6 +6,7 @@ import { type Locale } from "@/lib/i18n/config";
 import { type Dictionary } from "@/lib/i18n/get-dictionary";
 import { type ConcoursListItem } from "@/types/concours";
 import { ConcoursCard } from "./ConcoursCard";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Filter, X } from "lucide-react";
 
@@ -130,7 +131,15 @@ export function ConcoursGrid({
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {concours.map((item) => (
+            {concours.slice(0, 3).map((item) => (
+              <ConcoursCard key={item.id} concours={item} dict={dict} locale={locale} />
+            ))}
+            {concours.length > 3 && (
+              <div className="col-span-full">
+                <AdSlot placement="between-cards" className="max-w-lg mx-auto" />
+              </div>
+            )}
+            {concours.slice(3).map((item) => (
               <ConcoursCard key={item.id} concours={item} dict={dict} locale={locale} />
             ))}
           </div>

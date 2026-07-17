@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { REVALIDATION_TIMES, ITEMS_PER_PAGE } from "@/lib/utils/constants";
 import { generateSEOMetadata } from "@/lib/seo/generate-metadata";
 import { PDFCard } from "@/components/pdf/PDFCard";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { FileText } from "lucide-react";
@@ -58,7 +59,15 @@ export default async function BibliothquePage({ params, searchParams }: Props) {
       {data && data.length > 0 ? (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {data.map((doc) => (
+            {data.slice(0, 4).map((doc) => (
+              <PDFCard key={doc.id} document={doc} dict={dict} locale={locale} />
+            ))}
+            {data.length > 4 && (
+              <div className="col-span-full">
+                <AdSlot placement="between-cards" className="max-w-lg mx-auto" />
+              </div>
+            )}
+            {data.slice(4).map((doc) => (
               <PDFCard key={doc.id} document={doc} dict={dict} locale={locale} />
             ))}
           </div>

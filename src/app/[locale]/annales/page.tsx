@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ITEMS_PER_PAGE } from "@/lib/utils/constants";
 import { generateSEOMetadata } from "@/lib/seo/generate-metadata";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { formatDate } from "@/lib/utils/format-date";
 import { FileText, ExternalLink } from "lucide-react";
@@ -59,41 +60,47 @@ export default async function AnnalesPage({ params, searchParams }: Props) {
       {data && data.length > 0 ? (
         <>
           <div className="space-y-3">
-            {data.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:shadow-md transition-shadow"
-              >
-                <div className="rounded-lg bg-red-100 dark:bg-red-900 p-3">
-                  <FileText className="h-5 w-5 text-red-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium truncate">
-                    {locale === "ar" ? a.title_ar : a.title_fr}
-                  </h3>
-                  <p className="text-sm text-muted">
-                    {a.institution} • {a.subject} • {a.year}
-                  </p>
-                </div>
-                <a
-                  href={a.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-medium hover:bg-brand-700 transition-colors"
+            {data.map((a, i) => (
+              <div key={a.id}>
+                {(i === 3 && data.length > 4) && (
+                  <div className="py-4">
+                    <AdSlot placement="between-cards" className="max-w-lg mx-auto" />
+                  </div>
+                )}
+                <div
+                  className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:shadow-md transition-shadow"
                 >
-                  {dict.pdf.download}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-                {a.correction_url && (
+                  <div className="rounded-lg bg-red-100 dark:bg-red-900 p-3">
+                    <FileText className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium truncate">
+                      {locale === "ar" ? a.title_ar : a.title_fr}
+                    </h3>
+                    <p className="text-sm text-muted">
+                      {a.institution} • {a.subject} • {a.year}
+                    </p>
+                  </div>
                   <a
-                    href={a.correction_url}
+                    href={a.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+                    className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-medium hover:bg-brand-700 transition-colors"
                   >
-                    {dict.annales.correction}
+                    {dict.pdf.download}
+                    <ExternalLink className="h-3 w-3" />
                   </a>
-                )}
+                  {a.correction_url && (
+                    <a
+                      href={a.correction_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+                    >
+                      {dict.annales.correction}
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>

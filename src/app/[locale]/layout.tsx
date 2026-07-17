@@ -5,6 +5,7 @@ import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { AdSlot } from "@/components/ads/AdSlot";
 import "../globals.css";
 
 export async function generateStaticParams() {
@@ -69,6 +70,7 @@ export default async function LocaleLayout({
       <body className="min-h-screen bg-background font-sans antialiased">
         <ThemeProvider>
           <Header dict={dict} locale={locale} />
+          <AdSlot placement="header" className="mx-auto max-w-7xl" />
           <main className="min-h-[calc(100vh-180px)]">{children}</main>
           <Footer dict={dict} locale={locale} />
         </ThemeProvider>

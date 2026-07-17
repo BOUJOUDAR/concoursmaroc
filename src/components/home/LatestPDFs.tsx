@@ -3,6 +3,7 @@ import { type Locale } from "@/lib/i18n/config";
 import { type Dictionary } from "@/lib/i18n/get-dictionary";
 import { type DocumentListItem } from "@/types/pdf";
 import { PDFCard } from "@/components/pdf/PDFCard";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 
 interface LatestPDFsProps {
@@ -29,7 +30,15 @@ export function LatestPDFs({ documents, dict, locale }: LatestPDFsProps) {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {documents.map((doc) => (
+          {documents.slice(0, 4).map((doc) => (
+            <PDFCard key={doc.id} document={doc} dict={dict} locale={locale} />
+          ))}
+          {documents.length > 4 && (
+            <div className="col-span-full">
+              <AdSlot placement="between-cards" className="max-w-lg mx-auto" />
+            </div>
+          )}
+          {documents.slice(4).map((doc) => (
             <PDFCard key={doc.id} document={doc} dict={dict} locale={locale} />
           ))}
         </div>
