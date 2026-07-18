@@ -30,6 +30,7 @@ const BASE_URL = "https://www.emploi-public.ma";
 const LISTING_PATH = "/ar/%D9%82%D8%A7%D8%A6%D9%85%D8%A9-%D8%A7%D9%84%D9%85%D8%A8%D8%A7%D8%B1%D9%8A%D8%A7%D8%AA";
 const MAX_PAGES = parseInt(process.env.MAX_PAGES || "10", 10);
 const DELAY_MS = 1500;
+const STORAGE_BUCKET = "documents";
 
 const ARABIC_MONTHS = {
   "يناير": 1, "فبراير": 2, "مارس": 3, "أبريل": 4, "ابريل": 4,
@@ -135,6 +136,39 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+async function downloadPdf(url) {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/pdf,*/*",
+      },
+      redirect: "follow",
+    });
+    if (!res.ok) return null;
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("pdf")) return null;
+    return Buffer.from(await res.arrayBuffer());
+  } catch { return null; }
+}
+
+async function uploadPdf(storagePath, pdfBuffer) {
+  const { error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(storagePath, pdfBuffer, {
+      contentType: "application/pdf",
+      upsert: true,
+    });
+  if (error) return null;
+  const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
+  return urlData?.publicUrl || null;
+}
+
+function buildStoragePath(slug, type) {
+  const safe = (slug || "concours").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 60);
+  return `concours-pdfs/${safe}_${type}.pdf`;
+}
+
 function parseListingPage(html) {
   const $ = load(html);
   const items = [];
@@ -228,9 +262,9 @@ async function fetchDetailPage(url) {
     "list_attente": "لائحة الانتظار",
   };
   for (const [type, label] of Object.entries(pdfTypes)) {
-    const href = $(`a[href*='/ar/تحميل/المباريات/${type}/']`).attr("href");
+    const href = $(`a[href*='${type}']`).attr("href");
     if (href) {
-      detail.pdfs[type] = { url: `${BASE_URL}${href}`, label };
+      detail.pdfs[type] = { url: href.startsWith("http") ? href : `${BASE_URL}${href}`, label };
     }
   }
   if (detail.pdfs.arrete) detail.arreteUrl = detail.pdfs.arrete.url;
@@ -377,14 +411,43 @@ async function main() {
 
     const record = buildConcoursRecord(item, detail);
 
-    const { error } = await supabase.from("concours").insert(record);
-    if (error) {
-      console.error(`  FAILED: ${error.message}`);
+    const { error: insertErr } = await supabase.from("concours").insert(record);
+    if (insertErr) {
+      console.error(`  Insert FAILED: ${insertErr.message}`);
       failed++;
-    } else {
-      console.log(`  OK`);
-      imported++;
+      if (i < allItems.length - 1) await sleep(800);
+      continue;
     }
+
+    // Download and upload PDFs to Supabase Storage
+    if (detail?.pdfs && Object.keys(detail.pdfs).length > 0) {
+      const storagePdfs = {};
+      for (const [type, pdfInfo] of Object.entries(detail.pdfs)) {
+        const pdfBuffer = await downloadPdf(pdfInfo.url);
+        if (!pdfBuffer) {
+          console.log(`    Failed to download ${type}`);
+          continue;
+        }
+        const storagePath = buildStoragePath(record.slug, type);
+        const publicUrl = await uploadPdf(storagePath, pdfBuffer);
+        if (!publicUrl) {
+          console.log(`    Failed to upload ${type}`);
+          continue;
+        }
+        console.log(`    Uploaded ${type} (${(pdfBuffer.length / 1024).toFixed(0)} KB)`);
+        storagePdfs[type] = { url: publicUrl, label: pdfInfo.label, storagePath };
+        await sleep(500);
+      }
+      if (Object.keys(storagePdfs).length > 0) {
+        await supabase
+          .from("concours")
+          .update({ official_pdf_url: JSON.stringify(storagePdfs) })
+          .eq("slug", record.slug);
+      }
+    }
+
+    console.log(`  OK`);
+    imported++;
 
     if (i < allItems.length - 1) await sleep(800);
   }
